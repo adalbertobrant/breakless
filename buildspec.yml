@@ -13,4 +13,4 @@ phases:
       - "echo Build finished on `date`"
 artifacts:
   files:
-    - build/**/*
+    - breakless-react/build/**/*
