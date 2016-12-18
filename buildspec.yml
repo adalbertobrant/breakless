@@ -9,7 +9,7 @@ phases:
   build:
     commands:
       - "echo Build started on `date`"
-      - cd breakless-react && run build
+      - cd breakless-react && npm run build
       - "echo Build finished on `date`"
 artifacts:
   files:
