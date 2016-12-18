@@ -4,14 +4,12 @@ phases:
   pre_build:
     commands:
       - "echo Pre-Build started on `date`"
-      - cd breakless-react
-      - npm install
+      - cd breakless-react && npm install
       - "echo Pre-Build finished on `date`"
   build:
     commands:
       - "echo Build started on `date`"
-      - cd breakless-react
-      - npm run build
+      - cd breakless-react && run build
       - "echo Build finished on `date`"
 artifacts:
   files:
