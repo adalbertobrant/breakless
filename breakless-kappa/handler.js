@@ -31,30 +31,20 @@ module.exports.publishToS3 = (event, context, callback) => {
         sessionToken: artTok,
         signatureVersion: "v4"
       });
+
       s3.getObject({
         Bucket: bucketName,
         Key: objectKey
-      }, function(err, data) {
-          console.log("GOT OBJ")
-          // Handle any error and exit
-          if (err) {
-            console.log(err);
-            return err;
-          }
-        // No error happened
-        // Convert Body from a Buffer to a String
-        let body = data.Body;
-        fs.createReadStream(body)
-          .pipe(unzip.Parse())
-          .on('entry', function (entry) {
+      }).createReadStream()
+        .pipe(unzip.Parse())
+        .on('entry', function (entry) {
             var fileName = entry.path;
             var type = entry.type; // 'Directory' or 'File'
             var size = entry.size;
-            console.log(`Upload [${fileName}] to S3`)
+            console.log(`Upload [${fileName}][${type}][${size}] to S3`)
             //entry.pipe(fs.createWriteStream('output/path'));
             entry.autodrain();
           });
-      });
     };
     inputArtifacts.forEach(publish);
 
