@@ -1,6 +1,9 @@
 'use strict';
 const AWS = require('aws-sdk');
 const assert = require('assert');
+const fs = require('fs');
+const unzip = require('unzip');
+
 
 module.exports.publishToS3 = (event, context, callback) => {
     const codepipeline = new AWS.CodePipeline();
