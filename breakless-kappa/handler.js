@@ -48,16 +48,11 @@ module.exports.publishToS3 = (event, context, callback) => {
       },function(err,data){
         if (err) console.log(err, err.stack); // an error occurred
         else {
+          console.log(`Received [${data.ContentLength}] bytes`)
           let body = data.Body;
           var zip = new AdmZip(body);
-          var zipEntries = zip.getEntries(); // an array of ZipEntry records
-
-          zipEntries.forEach(function(zipEntry) {
-              console.log(zipEntry.toString()); // outputs zip entries information
-              /* if (zipEntry.entryName == "my_file.txt") {
-                   console.log(zipEntry.data.toString('utf8'));
-              } */
-          });
+          var zipEntries = zip.getEntries();
+          console.log(`Extracting [${zipEntries}] entries`);
         }
       });
 
