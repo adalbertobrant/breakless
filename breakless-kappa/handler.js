@@ -2,7 +2,7 @@
 const AWS = require('aws-sdk');
 const assert = require('assert');
 const fs = require('fs');
-const unzip = require('unzip');
+const AdmZip = require('adm-zip');
 
 
 module.exports.publishToS3 = (event, context, callback) => {
@@ -32,19 +32,35 @@ module.exports.publishToS3 = (event, context, callback) => {
         signatureVersion: "v4"
       });
 
+      var zip = new AdmZip("./my_file.zip");
+          var zipEntries = zip.getEntries(); // an array of ZipEntry records
+
+          zipEntries.forEach(function(zipEntry) {
+              console.log(zipEntry.toString()); // outputs zip entries information
+              if (zipEntry.entryName == "my_file.txt") {
+                   console.log(zipEntry.data.toString('utf8'));
+              }
+          });
+
       s3.getObject({
         Bucket: bucketName,
         Key: objectKey
-      }).createReadStream()
-        .pipe(unzip.Parse())
-        .on('entry', function (entry) {
-            var fileName = entry.path;
-            var type = entry.type; // 'Directory' or 'File'
-            var size = entry.size;
-            console.log(`Upload [${fileName}][${type}][${size}] to S3`)
-            //entry.pipe(fs.createWriteStream('output/path'));
-            entry.autodrain();
+      },function(err,data){
+        if (err) console.log(err, err.stack); // an error occurred
+        else {
+          let body = data.Body;
+          var zip = new AdmZip(body);
+          var zipEntries = zip.getEntries(); // an array of ZipEntry records
+
+          zipEntries.forEach(function(zipEntry) {
+              console.log(zipEntry.toString()); // outputs zip entries information
+              /* if (zipEntry.entryName == "my_file.txt") {
+                   console.log(zipEntry.data.toString('utf8'));
+              } */
           });
+        }
+      });
+
     };
     inputArtifacts.forEach(publish);
 
