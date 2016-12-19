@@ -1,0 +1,45 @@
+{
+    "CodePipeline.job": {
+        "id": "9dd5f3ba-8717-429f-9d01-20ba6a1210a8",
+        "accountId": "975034036806",
+        "data": {
+            "actionConfiguration": {
+                "configuration": {
+                    "FunctionName": "breakless-kappa-production-publishToS3",
+                    "UserParameters": "{\"Bucket\":\"breakless.cloud\"}"
+                }
+            },
+            "inputArtifacts": [
+                {
+                    "location": {
+                        "s3Location": {
+                            "bucketName": "codepipeline-us-west-2-243693522093",
+                            "objectKey": "breakless-pipes/breakless-/CRWcAHj"
+                        },
+                        "type": "S3"
+                    },
+                    "revision": null,
+                    "name": "breakless-bin"
+                }
+            ],
+            "outputArtifacts": [
+                {
+                    "location": {
+                        "s3Location": {
+                            "bucketName": "codepipeline-us-west-2-243693522093",
+                            "objectKey": "breakless-pipes/breakless-/jN9y2wK"
+                        },
+                        "type": "S3"
+                    },
+                    "revision": null,
+                    "name": "breakless-bin-key"
+                }
+            ],
+            "artifactCredentials": {
+                "secretAccessKey": "LidPDscfjGoLPW21fL3IvKY1fDBUNuVne6Mo1bNt",
+                "sessionToken": "AgoGb3JpZ2luEBMaCXVzLXdlc3QtMiKAAqo9bGqEd1fHm7w6+XWByXrdq9M/hPfRHrlMDv3TjH9pTcbOk2JJkdLobcWTzw5l6HmAOhSRnFS7UQ/e8Bmk3VMr1LIZIzVKRJcVd3fFaVzwHbdc99PJKKJbaR+l/2JH+qW0SCBcagbpA5Udh5Ro8CLhQy9mWEhgwS0RA1NXvmWXviv/WOSQJLj+/iuLbGFCBxYHTok91EOvCofeEaFV7GdBUL3izpOREq7B4joo0LoJzJEggLFt1jTwvJvg6pW5vZqMQ6LD2qXEte4UQ6t0Urr5c0uVjoTrr6UuH5rVGCTP6MDqKy3zmkqHzD9kQcmX9Ld+CSCKDtCgPWw1IB90UX4q+gQISRAAGgw5NzUwMzQwMzY4MDYiDBPr7PeILbUd1x2SHCrXBIO/yb5rYF5/T/O69zavYRylFGTca9IoAvhHQFa2/EjElLImyidXknEHLxdnZXoGPtmIHys8wMY1i8BCV+s+NK6xjw/TWik7VArFIcmeTYsntMxV82C1egIfV1PrWRz8rqFJKKKU0oNATp7ObTH7+fowCfVkMJ4sK10tVZlnAuLUZ6PpZR8keTTLqkeFKSVOW7SnbXGTgSZHkTlq2moQvjNx/dgzfm4fyeDCL9U/p6omlyaAG7RtqWhCfdnRzL64wutLKYhMqCy5GwsSXM7mWxnROfryD7bju56ZKTCKIQqT1EOkPRc06s3dGLqViyH6FM180wx+6k3a0WddVVpYbFVc4pEgAjd7I1dEB9d5eQvgQueJGo179XFXqyDJewHjsy5PF9to9+vnRkMNpTkQstBjwwjRqodpoAwf8Q8FP3dfrXkrlG04iXTrrHqmYyNM10dxdSo406/6F8qKymmMYVDelEygS7NS5PmIZnewLXfZ5p28QRA+ZAOmlxq+udEZbgylSyHF0cm9pr0XKoWa3WRiwMBIU276NnH8kMBchRNZ/O9OhKrWwaZNib5RXwWIJLN+UxQENB02aVPf6nmytFdk6ud7b4kPRy6pNEGCZxgCbP+0uNniWQsAgtCCAgzFtaPNb0+PfpLEQTGC8P+3RAgbg4SnQBQqBrWrhRWJtzZkM6Y/IEExjcok9twYlwBLBmHXoPUKSViBwYu5Kx9QpL+nw0+cgnUS8G6f4ZixZaxwkgrVdhtLqCRJlsPXjxJL313nG/pzD/bJ/JOYzj025S26Vm+P5mA1MPX638IF",
+                "accessKeyId": "ASIAICIHFBUGXGOYIVNA"
+            }
+        }
+    }
+}
