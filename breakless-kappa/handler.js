@@ -23,7 +23,6 @@ module.exports.publishToS3 = (event, context, callback) => {
       let s3loc = art.location.s3Location;
       let bucketName = s3loc.bucketName;
       let objectKey = s3loc.objectKey;
-      console.log("FOIIIIII");
 
       const s3 = new AWS.S3({
         accessKeyId: artKey,
@@ -31,16 +30,6 @@ module.exports.publishToS3 = (event, context, callback) => {
         sessionToken: artTok,
         signatureVersion: "v4"
       });
-
-      var zip = new AdmZip("./my_file.zip");
-          var zipEntries = zip.getEntries(); // an array of ZipEntry records
-
-          zipEntries.forEach(function(zipEntry) {
-              console.log(zipEntry.toString()); // outputs zip entries information
-              if (zipEntry.entryName == "my_file.txt") {
-                   console.log(zipEntry.data.toString('utf8'));
-              }
-          });
 
       s3.getObject({
         Bucket: bucketName,
