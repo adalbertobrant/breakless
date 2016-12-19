@@ -7,11 +7,17 @@ module.exports.publishToS3 = (event, context, callback) => {
     let job = event["CodePipeline.job"] || {};
     let jobId = job.id;
     assert(jobId,"CodePipeline Job ID is required but not found.");
+    console.log("===xxx===");
+    let artifacts = event["CodePipeline.job"]
+      .inputArtifacts
+      .foreach(art => { console.log(JSON.stringfy(art + "\n===="); ) } )
+
     let eventStr   = JSON.stringify(event);
     let contextStr = JSON.stringify(context);
     console.log(eventStr);
     console.log("===");
     console.log(contextStr);
+    console.log("===xxx===");
 
     var putJobSuccess = function(message) {
         var params = {
