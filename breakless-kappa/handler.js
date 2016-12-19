@@ -40,10 +40,18 @@ module.exports.publishToS3 = (event, context, callback) => {
           }
         // No error happened
         // Convert Body from a Buffer to a String
-        let objectData = data.Body.toString('utf-8'); // Use the encoding necessary
-        console.log("GOT "+objectData.length)
+        let body = data.Body;
+        fs.createReadStream(body)
+          .pipe(unzip.Parse())
+          .on('entry', function (entry) {
+            var fileName = entry.path;
+            var type = entry.type; // 'Directory' or 'File'
+            var size = entry.size;
+            console.log(`Upload [${fileName}] to S3`)
+            //entry.pipe(fs.createWriteStream('output/path'));
+            entry.autodrain();
+          });
       });
-      console.log("FOIIIIII");
     };
     inputArtifacts.forEach(publish);
 
@@ -53,8 +61,8 @@ module.exports.publishToS3 = (event, context, callback) => {
     //console.log("===");
     //console.log(contextStr);
     setTimeout(function(){
-      callback(null,"OK");
-    },1500);
+      callback(null,"function finished");
+    },2500);
 
     return;
     /*
