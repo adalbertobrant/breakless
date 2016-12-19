@@ -7,7 +7,7 @@ module.exports.publishToS3 = (event, context, callback) => {
     const job = event["CodePipeline.job"] || {};
     const jobId = job.id;
     assert(jobId,"CodePipeline Job ID is required but not found.");
-    console.log("===xxx===");
+    console.log("=== 2016-12-19T1526 ===");
     const data = event["CodePipeline.job"].data;
     const inputArtifacts = data.inputArtifacts;
     const artCreds = data.artifactCredentials;
@@ -16,7 +16,6 @@ module.exports.publishToS3 = (event, context, callback) => {
     const artTok = artCreds.sessionToken;
 
     const publish = function(art){
-      console.log("===ppp===");
       console.log(`== ${art.name} ==`);
       let s3loc = art.location.s3Location;
       let bucketName = s3loc.bucketName;
@@ -26,7 +25,8 @@ module.exports.publishToS3 = (event, context, callback) => {
       const s3 = new AWS.S3({
         accessKeyId: artKey,
         secretAccessKey: artSec,
-        sessionToken: artTok
+        sessionToken: artTok,
+        signatureVersion: "v4"
       });
       s3.getObject({
         Bucket: bucketName,
