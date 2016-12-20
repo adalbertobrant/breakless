@@ -57,9 +57,9 @@ module.exports.publishToS3 = (event, context, callback) => {
 
     let eventStr   = JSON.stringify(event);
     let contextStr = JSON.stringify(context);
-    //console.log(eventStr);
-    //console.log("===");
-    //console.log(contextStr);
+    console.log(eventStr);
+    console.log("===");
+    console.log(contextStr);
     setTimeout(function(){
       callback(null,"function finished");
     },2500);
