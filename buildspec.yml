@@ -13,5 +13,5 @@ phases:
       - "echo Build finished on `date`"
 artifacts:
   files:
-    - breakless-react/build/**/*
+    - breakless-react/build/*
   discard-paths: yes

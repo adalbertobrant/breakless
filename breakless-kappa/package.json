@@ -1,0 +1,29 @@
+{
+  "name": "breakless-kappa",
+  "version": "1.0.0",
+  "description": "Breakless CD",
+  "main": "handler.js",
+  "dependencies": {
+    "aws-sdk": "^2.7.15",
+    "adm-zip": "^0.4.7",
+    "fs": "^0.0.1-security"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jfaerman/breakless.git"
+  },
+  "keywords": [
+    "aws",
+    "serverless"
+  ],
+  "author": "Julio Faerman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jfaerman/breakless/issues"
+  },
+  "homepage": "https://github.com/jfaerman/breakless#readme"
+}
