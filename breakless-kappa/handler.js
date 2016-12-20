@@ -41,7 +41,14 @@ module.exports.publishToS3 = (event, context, callback) => {
           let body = data.Body;
           var zip = new AdmZip(body);
           var zipEntries = zip.getEntries();
-          console.log(`Extracting [${zipEntries}] entries`);
+          console.log(`Extracting [${zipEntries.length}] entries`);
+          zipEntries.forEach(function(zipEntry) {
+              console.log("+==");
+              console.log(zipEntry.toString()); // outputs zip entries information
+              if (zipEntry.entryName == "my_file.txt") {
+                   console.log(zipEntry.data.toString('utf8'));
+              }
+          });
         }
       });
 
