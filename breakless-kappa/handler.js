@@ -4,6 +4,9 @@ const assert = require('assert');
 const fs = require('fs');
 const AdmZip = require('adm-zip');
 
+const prefixRex = prefix.replace(/^breakless\-react\/build\//, '');
+
+const outBucket = "breakless.bike";
 
 module.exports.publishToS3 = (event, context, callback) => {
     const codepipeline = new AWS.CodePipeline();
@@ -24,14 +27,16 @@ module.exports.publishToS3 = (event, context, callback) => {
       let bucketName = s3loc.bucketName;
       let objectKey = s3loc.objectKey;
 
-      const s3 = new AWS.S3({
+      const s3In = new AWS.S3({
         accessKeyId: artKey,
         secretAccessKey: artSec,
         sessionToken: artTok,
         signatureVersion: "v4"
       });
 
-      s3.getObject({
+      const s3Out = new AWS.S3();
+
+      s3In.getObject({
         Bucket: bucketName,
         Key: objectKey
       },function(err,data){
@@ -39,15 +44,21 @@ module.exports.publishToS3 = (event, context, callback) => {
         else {
           console.log(`Received [${data.ContentLength}] bytes`)
           let body = data.Body;
-          var zip = new AdmZip(body);
-          var zipEntries = zip.getEntries();
-          console.log(`Extracting [${zipEntries.length}] entries`);
-          zipEntries.forEach(function(zipEntry) {
-              console.log("+==");
-              console.log(zipEntry.toString()); // outputs zip entries information
-              if (zipEntry.entryName == "my_file.txt") {
-                   console.log(zipEntry.data.toString('utf8'));
-              }
+          let zip = new AdmZip(body);
+          let entries = zip.getEntries();
+          console.log(`Extracting [${entries.length}] entries`);
+          entries.forEach(function(entry) {
+              let entryName = entry.entryName;
+              let keyName = entryName.replace(prefixRex,'');
+              let body = zipEntry.data
+              s3Out.putObject({
+                Bucket: outBucket,
+                Key: keyName,
+                Body: body
+              },function(err,data){
+                if (err) console.log(err, err.stack);
+                else     console.log(`Put [${keyName}]`);
+              });
           });
         }
       });
