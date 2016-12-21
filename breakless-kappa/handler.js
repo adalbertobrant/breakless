@@ -50,7 +50,7 @@ module.exports.publishToS3 = (event, context, callback) => {
           entries.forEach(function(entry) {
               let entryName = entry.entryName;
               let keyName = entryName.replace(prefixRex,'');
-              let body = zipEntry.data
+              let body = entry.data
               s3Out.putObject({
                 Bucket: outBucket,
                 Key: keyName,
