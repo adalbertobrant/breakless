@@ -4,7 +4,7 @@ const assert = require('assert');
 const fs = require('fs');
 const AdmZip = require('adm-zip');
 
-const prefixRex = prefix.replace(/^breakless\-react\/build\//, '');
+const prefixRex = /^breakless\-react\/build\//;
 
 const outBucket = "breakless.bike";
 
