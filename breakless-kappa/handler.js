@@ -94,4 +94,4 @@ module.exports.publishToS3 = (event, context, callback) => {
     };
     if (jobId) putJobSuccess("LambdaFunctionsReleaseToS3 completed OK!");
     */
-};
+}; 
