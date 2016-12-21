@@ -9,14 +9,15 @@ const prefixRex = /^breakless\-react\/build\//;
 
 const outBucket = "breakless.bike";
 const outRegion = "us-east-1";
- const codepipeline = new AWS.CodePipeline();
+const codepipeline = new AWS.CodePipeline();
 
 const publishAll = (event, context, callback) => {
     const job = event["CodePipeline.job"];    
     assert(job,"CodePipeline Job is required but not found.");
-    const {id:jobId, data} = job;
 
-    console.log("=== ES6 100 ===");    
+    const jobId = job.id;
+    console.log("=== ES6 99 ===");
+    const data = event["CodePipeline.job"].data;
     const inputArtifacts = data.inputArtifacts;
     const artCreds = data.artifactCredentials;
     const artKey = artCreds.accessKeyId;
