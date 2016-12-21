@@ -20,11 +20,7 @@ provider:
     - Effect: "Allow"
       Action:
         - "s3:*"
-      Resource: "arn:aws:s3:::codepipeline*"
-    - Effect: "Allow"
-      Action:
-        - "s3:*"
-      Resource: "arn:aws:s3:::breakless.bike/*"      
+      Resource: "*"    
 
 
 # you can overwrite defaults here
