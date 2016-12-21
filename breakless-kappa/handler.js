@@ -15,8 +15,8 @@ const publishAll = (event, context, callback) => {
     const job = event["CodePipeline.job"];    
     assert(job,"CodePipeline Job is required but not found.");
 
-    const jobId = job.id;
-    console.log("=== ES6 99 ===");
+    const {id:jobId} = job;
+    console.log("=== ES6 101 ===");
     const data = event["CodePipeline.job"].data;
     const inputArtifacts = data.inputArtifacts;
     const artCreds = data.artifactCredentials;
@@ -55,7 +55,7 @@ const publishAll = (event, context, callback) => {
               let keyName = entryName.replace(prefixRex,'');
               let decompressed = zip.readFile(entry);
               let contentType = mime.lookup(entry.name);
-              console.log(`Put s3://${outBucket}/${keyName} as [${contentType}]`)
+              
               s3Out.putObject({
                 Bucket: outBucket,
                 Key: keyName,
@@ -64,7 +64,7 @@ const publishAll = (event, context, callback) => {
                 ACL: 'public-read'
               },function(err,data){
                 if (err) console.log(err, err.stack);
-                else     console.log(`OK [${keyName}]`);
+                else     console.log(`Put OK s3://${outBucket}/${keyName} as [${contentType}]`)
               });
           });
         }
