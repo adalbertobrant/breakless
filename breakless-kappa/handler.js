@@ -11,12 +11,12 @@ const outBucket = "breakless.bike";
 const outRegion = "us-east-1";
 
 
-module.exports.publishToS3 = (event, context, callback) => {
+const publishAll = (event, context, callback) => {
     const codepipeline = new AWS.CodePipeline();
     const job = event["CodePipeline.job"] || {};
     const jobId = job.id;
     assert(jobId,"CodePipeline Job ID is required but not found.");
-    console.log("=== 2016-12-19T1526 ===");
+    console.log("=== ES6 2016-12-19T1526 ===");
     const data = event["CodePipeline.job"].data;
     const inputArtifacts = data.inputArtifacts;
     const artCreds = data.artifactCredentials;
@@ -100,3 +100,5 @@ module.exports.publishToS3 = (event, context, callback) => {
     if (jobId) putJobSuccess("LambdaFunctionsReleaseToS3 completed OK!");
     */
 }; 
+
+module.exports.publishToS3 = publishAll;
