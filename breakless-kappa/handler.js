@@ -9,43 +9,38 @@ const prefixRex = /^breakless\-react\/build\//;
 
 const outBucket = "breakless.bike";
 const outRegion = "us-east-1";
+const codepipeline = new AWS.CodePipeline();
 
+function publishAll(event, context, callback){
+  console.log("PublishToS3 started");
+  const job = event["CodePipeline.job"];
+  assert(job,"CodePipeline Job is required but not found.");
 
-module.exports.publishToS3 = (event, context, callback) => {
-    const codepipeline = new AWS.CodePipeline();
-    const job = event["CodePipeline.job"] || {};
-    const jobId = job.id;
-    assert(jobId,"CodePipeline Job ID is required but not found.");
-    console.log("=== 2016-12-19T1526 ===");
-    const data = event["CodePipeline.job"].data;
-    const inputArtifacts = data.inputArtifacts;
-    const artCreds = data.artifactCredentials;
-    const artKey = artCreds.accessKeyId;
-    const artSec = artCreds.secretAccessKey;
-    const artTok = artCreds.sessionToken;
-
-    const publish = function(art){
-      console.log(`== ${art.name} ==`);
-      let s3loc = art.location.s3Location;
-      let bucketName = s3loc.bucketName;
-      let objectKey = s3loc.objectKey;
-
-      const s3In = new AWS.S3({
+  const {id:jobId, data:data} = job;
+  const {inputArtifacts, artifactCredentials:artCreds} = data;  
+  const {
+    accessKeyId:artKey,
+    secretAccessKey:artSec,
+    sessionToken:artTok
+  }  = artCreds;
+  
+  const s3In = new AWS.S3({
         accessKeyId: artKey,
         secretAccessKey: artSec,
         sessionToken: artTok,
         signatureVersion: "v4"
-      });
+  });
+  const s3Out = new AWS.S3();
 
-      const s3Out = new AWS.S3();
+  function publishOne(art){
+    console.log(`Publishing ${art.name}`);
+    let s3loc = art.location.s3Location;
+    let { bucketName, objectKey } = s3loc;
 
-      s3In.getObject({
-        Bucket: bucketName,
-        Key: objectKey
-      },function(err,data){
+    function extractAndPut(err,data){
         if (err) console.log(err, err.stack);
         else {
-          console.log(`Received [${data.ContentLength}] bytes`)
+          console.log(`ZIP artifact is [${data.ContentLength}] bytes`)
           let body = data.Body;
           let zip = new AdmZip(body);
           let entries = zip.getEntries();
@@ -55,7 +50,6 @@ module.exports.publishToS3 = (event, context, callback) => {
               let keyName = entryName.replace(prefixRex,'');
               let decompressed = zip.readFile(entry);
               let contentType = mime.lookup(entry.name);
-              console.log(`Put s3://${outBucket}/${keyName} as [${contentType}]`)
               s3Out.putObject({
                 Bucket: outBucket,
                 Key: keyName,
@@ -64,39 +58,36 @@ module.exports.publishToS3 = (event, context, callback) => {
                 ACL: 'public-read'
               },function(err,data){
                 if (err) console.log(err, err.stack);
-                else     console.log(`OK [${keyName}]`);
+                else console.log(`Put s3://${outBucket}/${keyName} as [${contentType}]`);
               });
           });
         }
-      });
+      }
 
-    };
-    inputArtifacts.forEach(publish);
+    s3In.getObject({
+        Bucket: bucketName,
+        Key: objectKey
+      },extractAndPut);
+  }  
 
-    let eventStr   = JSON.stringify(event);
-    let contextStr = JSON.stringify(context);
-    console.log(eventStr);
-    console.log("===");
-    console.log(contextStr);
-    setTimeout(function(){
-      callback(null,"function finished");
-    },2500);
+  inputArtifacts.forEach(publishOne);
 
-    return;
-    /*
-    var putJobSuccess = function(message) {
-        var params = {
-            jobId: jobId
-        };
-        codepipeline.putJobSuccessResult(params, function(err, data) {
-            if(err) {
-                context.fail(err);
-            } else {
-                context.succeed(message);
-            }
-        });
-
-    };
-    if (jobId) putJobSuccess("LambdaFunctionsReleaseToS3 completed OK!");
-    */
+  let eventStr   = JSON.stringify(event);
+  let contextStr = JSON.stringify(context);
+  console.log(eventStr);
+  console.log("===");
+  console.log(contextStr);
+  console.log("===");
+  var params = {
+    jobId: jobId
+  };
+  codepipeline.putJobSuccessResult(params, function(err, data) {
+    if(err) {
+      context.fail(err);
+    } else {
+      context.succeed(message);
+    }
+  });
 }; 
+
+module.exports.publishToS3 = publishAll;
