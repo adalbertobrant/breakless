@@ -7,6 +7,7 @@ const AdmZip = require('adm-zip');
 const prefixRex = /^breakless\-react\/build\//;
 
 const outBucket = "breakless.bike";
+const outRegion = "us-east-1";
 
 module.exports.publishToS3 = (event, context, callback) => {
     const codepipeline = new AWS.CodePipeline();
@@ -51,13 +52,14 @@ module.exports.publishToS3 = (event, context, callback) => {
               let entryName = entry.entryName;
               let keyName = entryName.replace(prefixRex,'');
               let body = entry.data
+              console.log(`Put s3://${outBucket}/${keyName}`)
               s3Out.putObject({
                 Bucket: outBucket,
                 Key: keyName,
-                Body: body
+                Body: body,
               },function(err,data){
                 if (err) console.log(err, err.stack);
-                else     console.log(`Put [${keyName}]`);
+                else     console.log(`OK [${keyName}]`);
               });
           });
         }
