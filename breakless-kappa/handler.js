@@ -52,11 +52,14 @@ module.exports.publishToS3 = (event, context, callback) => {
               let entryName = entry.entryName;
               let keyName = entryName.replace(prefixRex,'');
               let decompressed = zip.readFile(entry);
-              console.log(`Put s3://${outBucket}/${keyName}`)
+              let contentType = mime.lookup(entry.name);
+              console.log(`Put s3://${outBucket}/${keyName} as [${contentType}]`)
               s3Out.putObject({
                 Bucket: outBucket,
                 Key: keyName,
                 Body: decompressed,
+                ContentType: contentType,
+                ACL: 'public-read'
               },function(err,data){
                 if (err) console.log(err, err.stack);
                 else     console.log(`OK [${keyName}]`);
