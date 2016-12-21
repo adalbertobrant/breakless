@@ -11,7 +11,7 @@ const outBucket = "breakless.bike";
 const outRegion = "us-east-1";
 const codepipeline = new AWS.CodePipeline();
 
-function publishAll(event, context, callback){
+const publishAll = (event, context, callback) => {
   console.log("PublishToS3 started");
   const job = event["CodePipeline.job"];
   assert(job,"CodePipeline Job is required but not found.");
