@@ -8,31 +8,40 @@ const prefixRex = /^breakless\-react\/build\//;
 
 const outBucket = "breakless.bike";
 const outRegion = "us-east-1";
-const codepipeline = new AWS.CodePipeline();
 
-function publishAllArtifacts(job){
-  console.log("XXX")
-  console.log(job)
-  assert(job,"CodePipeline Job is required but not found.");
-  const { id:jobId, data } = job;
-  console.log(`Publishing artifacts for job [${jobId}]`)
-  const { inputArtifacts, artifactCredentials} = data;
-  const { accessKeyId, secretAccessKey, sessionToken} = artifactCredentials;
-  const s3In = new AWS.S3({
-    accessKeyId: accessKeyId,
-    secretAccessKey: secretAccessKey,
-    sessionToken: sessionToken,
-    signatureVersion: "v4"
-  });
-  const s3Out = new AWS.S3();
+module.exports.publishToS3 = (event, context, callback) => {
+    const codepipeline = new AWS.CodePipeline();
+    const job = event["CodePipeline.job"] || {};
+    const jobId = job.id;
+    assert(jobId,"CodePipeline Job ID is required but not found.");
+    console.log("=== 2016-12-19T1526 ===");
+    const data = event["CodePipeline.job"].data;
+    const inputArtifacts = data.inputArtifacts;
+    const artCreds = data.artifactCredentials;
+    const artKey = artCreds.accessKeyId;
+    const artSec = artCreds.secretAccessKey;
+    const artTok = artCreds.sessionToken;
 
-  function publish(art){
-      console.log(`Publishing ${art.name}`);
+    const publish = function(art){
+      console.log(`== ${art.name} ==`);
       let s3loc = art.location.s3Location;
-      let {bucketName, objectKey}  = s3loc;
+      let bucketName = s3loc.bucketName;
+      let objectKey = s3loc.objectKey;
 
-      function extractAndPut(err,data){
-        if (err) console.log(err, err.stack);
+      const s3In = new AWS.S3({
+        accessKeyId: artKey,
+        secretAccessKey: artSec,
+        sessionToken: artTok,
+        signatureVersion: "v4"
+      });
+
+      const s3Out = new AWS.S3();
+
+      s3In.getObject({
+        Bucket: bucketName,
+        Key: objectKey
+      },function(err,data){
+        if (err) console.log(err, err.stack); // an error occurred
         else {
           console.log(`Received [${data.ContentLength}] bytes`)
           let body = data.Body;
@@ -54,25 +63,15 @@ function publishAllArtifacts(job){
               });
           });
         }
-      }
-      s3In.getObject({
-        Bucket: bucketName,
-        Key: objectKey
-      },extractAndPut);
-  }
-  inputArtifacts.forEach(publish);
-}
+      });
 
-module.exports.publishToS3 = (event, context, callback) => {
-    console.log("publishToS3 started");
-    const job   = event["CodePipeline.job"];
-    publishAllArtifacts(job);
+    };
+    inputArtifacts.forEach(publish);
 
     let eventStr   = JSON.stringify(event);
     let contextStr = JSON.stringify(context);
-    console.log("= EVENT =");
     console.log(eventStr);
-    console.log("= CONTEXT =");
+    console.log("===");
     console.log(contextStr);
     setTimeout(function(){
       callback(null,"function finished");
