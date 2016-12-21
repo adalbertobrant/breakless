@@ -3,11 +3,13 @@ const AWS = require('aws-sdk');
 const assert = require('assert');
 const fs = require('fs');
 const AdmZip = require('adm-zip');
+const mime = require('mime-types');
 
 const prefixRex = /^breakless\-react\/build\//;
 
 const outBucket = "breakless.bike";
 const outRegion = "us-east-1";
+
 
 module.exports.publishToS3 = (event, context, callback) => {
     const codepipeline = new AWS.CodePipeline();
