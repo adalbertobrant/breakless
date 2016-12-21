@@ -51,12 +51,12 @@ module.exports.publishToS3 = (event, context, callback) => {
           entries.forEach(function(entry) {
               let entryName = entry.entryName;
               let keyName = entryName.replace(prefixRex,'');
-              let body = entry.data
+              let decompressed = zip.readFile(entry);
               console.log(`Put s3://${outBucket}/${keyName}`)
               s3Out.putObject({
                 Bucket: outBucket,
                 Key: keyName,
-                Body: body,
+                Body: decompressed,
               },function(err,data){
                 if (err) console.log(err, err.stack);
                 else     console.log(`OK [${keyName}]`);
