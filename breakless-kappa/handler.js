@@ -1,104 +1,104 @@
 'use strict';
-const AWS = require('aws-sdk');
-const assert = require('assert');
-const fs = require('fs');
-const AdmZip = require('adm-zip');
-const mime = require('mime-types');
 
-const prefixRex = /^breakless\-react\/build\//;
+var AWS = require('aws-sdk');
+var assert = require('assert');
+var AdmZip = require('adm-zip');
+var mime = require('mime-types');
 
-const outBucket = "breakless.bike";
-const outRegion = "us-east-1";
-const codepipeline = new AWS.CodePipeline();
+var prefixRex = /^breakless\-react\/build\//;
 
-const publishAll = (event, context, callback) => {
-    const job = event["CodePipeline.job"];    
-    assert(job,"CodePipeline Job is required but not found.");
+var outBucket = "breakless.bike";
+var outRegion = "us-east-1";
+var codepipeline = new AWS.CodePipeline();
 
-    const jobId = job.id;
-    console.log("=== ES6 102 ===");
-    const data = event["CodePipeline.job"].data;
-    const inputArtifacts = data.inputArtifacts;
-    const artCreds = data.artifactCredentials;
-    const artKey = artCreds.accessKeyId;
-    const artSec = artCreds.secretAccessKey;
-    const artTok = artCreds.sessionToken;
+var publishAll = function publishAll(event, context, callback) {
+  var job = event["CodePipeline.job"];
+  assert(job, "CodePipeline Job is required but not found.");
 
-    const publish = function(art){
-      console.log(`== ${art.name} ==`);
-      let s3loc = art.location.s3Location;
-      let bucketName = s3loc.bucketName;
-      let objectKey = s3loc.objectKey;
+  var jobId = job.id,
+      data = job.data;
 
-      const s3In = new AWS.S3({
-        accessKeyId: artKey,
-        secretAccessKey: artSec,
-        sessionToken: artTok,
-        signatureVersion: "v4"
-      });
+  console.log("=== ES6 FTW ===");
 
-      const s3Out = new AWS.S3();
+  var inputArtifacts = data.inputArtifacts;
+  var artCreds = data.artifactCredentials;
+  var artKey = artCreds.accessKeyId;
+  var artSec = artCreds.secretAccessKey;
+  var artTok = artCreds.sessionToken;
 
-      s3In.getObject({
-        Bucket: bucketName,
-        Key: objectKey
-      },function(err,data){
-        if (err) console.log(err, err.stack);
-        else {
-          console.log(`Received [${data.ContentLength}] bytes`)
-          let body = data.Body;
-          let zip = new AdmZip(body);
-          let entries = zip.getEntries();
-          console.log(`Extracting [${entries.length}] entries`);
-          entries.forEach(function(entry) {
-              let entryName = entry.entryName;
-              let keyName = entryName.replace(prefixRex,'');
-              let decompressed = zip.readFile(entry);
-              let contentType = mime.lookup(entry.name);
-              
-              s3Out.putObject({
-                Bucket: outBucket,
-                Key: keyName,
-                Body: decompressed,
-                ContentType: contentType,
-                ACL: 'public-read'
-              },function(err,data){
-                if (err) console.log(err, err.stack);
-                else     console.log(`Put s3://${outBucket}/${keyName} as [${contentType}]`)
-              });
+  var publish = function publish(art) {
+    console.log('== ' + art.name + ' ==');
+    var s3loc = art.location.s3Location;
+    var bucketName = s3loc.bucketName;
+    var objectKey = s3loc.objectKey;
+
+    var s3In = new AWS.S3({
+      accessKeyId: artKey,
+      secretAccessKey: artSec,
+      sessionToken: artTok,
+      signatureVersion: "v4"
+    });
+
+    var s3Out = new AWS.S3();
+
+    s3In.getObject({
+      Bucket: bucketName,
+      Key: objectKey
+    }, function (err, data) {
+      if (err) console.log(err, err.stack);else {
+        (function () {
+          console.log('Received [' + data.ContentLength + '] bytes');
+          var body = data.Body;
+          var zip = new AdmZip(body);
+          var entries = zip.getEntries();
+          console.log('Extracting [' + entries.length + '] entries');
+          entries.forEach(function (entry) {
+            var entryName = entry.entryName;
+            var keyName = entryName.replace(prefixRex, '');
+            var decompressed = zip.readFile(entry);
+            var contentType = mime.lookup(entry.name);
+
+            s3Out.putObject({
+              Bucket: outBucket,
+              Key: keyName,
+              Body: decompressed,
+              ContentType: contentType,
+              ACL: 'public-read'
+            }, function (err, data) {
+              if (err) console.log(err, err.stack);else console.log('Put s3://' + outBucket + '/' + keyName + ' as [' + contentType + ']');
+            });
           });
-        }
+        })();
+      }
+    });
+  };
+  inputArtifacts.forEach(publish);
+
+  var eventStr = JSON.stringify(event);
+  var contextStr = JSON.stringify(context);
+  console.log(eventStr);
+  console.log("===");
+  console.log(contextStr);
+  setTimeout(function () {
+    callback(null, "function finished");
+  }, 2500);
+
+  return;
+  /*
+  var putJobSuccess = function(message) {
+      var params = {
+          jobId: jobId
+      };
+      codepipeline.putJobSuccessResult(params, function(err, data) {
+          if(err) {
+              context.fail(err);
+          } else {
+              context.succeed(message);
+          }
       });
-
-    };
-    inputArtifacts.forEach(publish);
-
-    let eventStr   = JSON.stringify(event);
-    let contextStr = JSON.stringify(context);
-    console.log(eventStr);
-    console.log("===");
-    console.log(contextStr);
-    setTimeout(function(){
-      callback(null,"function finished");
-    },2500);
-
-    return;
-    /*
-    var putJobSuccess = function(message) {
-        var params = {
-            jobId: jobId
-        };
-        codepipeline.putJobSuccessResult(params, function(err, data) {
-            if(err) {
-                context.fail(err);
-            } else {
-                context.succeed(message);
-            }
-        });
-
-    };
-    if (jobId) putJobSuccess("LambdaFunctionsReleaseToS3 completed OK!");
-    */
-}; 
+   };
+  if (jobId) putJobSuccess("LambdaFunctionsReleaseToS3 completed OK!");
+  */
+};
 
 module.exports.publishToS3 = publishAll;
